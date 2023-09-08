@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/BakuPukul/blockchain-platform/config"
 	"github.com/BakuPukul/blockchain-platform/internal/server"
+	"github.com/BakuPukul/blockchain-platform/pkg/db"
 	"github.com/BakuPukul/blockchain-platform/pkg/logger"
 )
 
@@ -14,6 +15,11 @@ func main() {
 		l.Fatal(err)
 	}
 
-	s := server.NewServer(c, l)
+	db, err := db.NewRedis(c)
+	if err != nil {
+		l.Fatal(err)
+	}
+
+	s := server.NewServer(c, l, db)
 	s.Run()
 }

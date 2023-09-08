@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  node-1:
+    container_name: node-1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db-node-1
+    ports:
+      - 8080:8080
+    networks:
+      - app-network
+
+  db-node-1:
+    container_name: db-node-1
+    image: redis:7-alpine
+    command: redis-server --save 20 1 --loglevel warning
+    ports:
+      - 6379:6379
+    volumes:
+      - node-1:/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  node-1:
+    driver: local

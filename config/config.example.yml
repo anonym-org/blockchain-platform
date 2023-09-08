@@ -1,0 +1,4 @@
+server:
+  port: :8080
+db:
+  dsn: localhost:6379
