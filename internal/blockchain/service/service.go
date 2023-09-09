@@ -10,39 +10,32 @@ import (
 )
 
 const (
-	lastHashKey = "last_hash"
+	redisKeyCurrentHash = "current_hash"
 )
 
 type service struct {
-	log logger.Logger
-	db  *redis.Client
+	log        logger.Logger
+	repository blockchain.Repository
 }
 
-func NewService(log logger.Logger, db *redis.Client) blockchain.Usecase {
+func NewService(log logger.Logger, repository blockchain.Repository) blockchain.Usecase {
 	return &service{
-		log: log,
-		db:  db,
+		log:        log,
+		repository: repository,
 	}
 }
 
 func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 	var lastHash []byte
 
-	val, err := s.db.Get(ctx, lastHashKey).Result()
+	val, err := s.repository.Get(ctx, redisKeyCurrentHash)
 	if err != nil {
 		if err != redis.Nil {
 			s.log.Fatal(err)
 		}
 
 		genesis := domain.Genesis()
-
-		err = s.db.Set(ctx, string(genesis.Hash), genesis.Serialize(), 0).Err()
-		if err != nil {
-			s.log.Fatal(err)
-		}
-
-		err = s.db.Set(ctx, lastHashKey, genesis.Hash, 0).Err()
-		if err != nil {
+		if err = s.repository.Add(ctx, redisKeyCurrentHash, genesis); err != nil {
 			s.log.Fatal(err)
 		}
 
@@ -59,19 +52,15 @@ func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 func (s *service) AddBlock(ctx context.Context, data string) error {
 	var lastHash []byte
 
-	val, err := s.db.Get(ctx, lastHashKey).Result()
+	val, err := s.repository.Get(ctx, redisKeyCurrentHash)
 	if err != nil {
 		s.log.Error(err)
 		return err
 	}
 
-	lastHash = append(lastHash, []byte(val)...)
+	lastHash = append(lastHash, val...)
 	newBlock := domain.NewBlock(data, lastHash)
-	if err := s.db.Set(ctx, string(newBlock.Hash), newBlock.Serialize(), 0).Err(); err != nil {
-		s.log.Error(err)
-		return err
-	}
-	if err := s.db.Set(ctx, lastHashKey, newBlock.Hash, 0).Err(); err != nil {
+	if err := s.repository.Add(ctx, redisKeyCurrentHash, newBlock); err != nil {
 		s.log.Error(err)
 		return err
 	}
@@ -80,13 +69,13 @@ func (s *service) AddBlock(ctx context.Context, data string) error {
 }
 
 func (s *service) Next(ctx context.Context, blockchain *domain.Blockchain) (*domain.Block, error) {
-	val, err := s.db.Get(ctx, string(blockchain.CurrentHash)).Result()
+	val, err := s.repository.Get(ctx, string(blockchain.CurrentHash))
 	if err != nil {
 		s.log.Error(err)
 		return nil, err
 	}
 
-	block := domain.Deserialize([]byte(val))
+	block := domain.Deserialize(val)
 	blockchain.CurrentHash = block.PrevHash
 
 	return block, nil
