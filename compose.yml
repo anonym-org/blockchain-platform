@@ -4,7 +4,7 @@ services:
   node-1:
     container_name: node-1
     build:
-      context: .
+      context: ./node
       dockerfile: Dockerfile
     depends_on:
       - db-node-1

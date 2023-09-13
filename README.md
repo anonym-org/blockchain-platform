@@ -10,10 +10,12 @@ blockchain network platform
 
 ## Development
 
-- Copy `config.example.yml` to `config.yml`, then adjust your env configuration
+- Copy `node/config.example.yml` to `node/config.yml`, then adjust your env configuration
 
-- Run server:
+- Adjust nodes service in `compose.yml`
+
+- Start network:
 
 ```bash
-go run cmd/main.go
+docker-compose up -d
 ```
