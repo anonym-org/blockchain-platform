@@ -21,5 +21,8 @@ func main() {
 	}
 
 	s := server.NewServer(c, l, db)
-	s.Run()
+	err = s.Run()
+	if err != nil {
+		l.Fatal(err)
+	}
 }
