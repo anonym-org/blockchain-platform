@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"os"
 
 	"github.com/BakuPukul/blockchain-platform/config"
 	"github.com/redis/go-redis/v9"
@@ -10,7 +9,7 @@ import (
 
 func NewRedis(config *config.Config) (*redis.Client, error) {
 	db := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("DB_DSN"),
+		Addr:     config.DSN,
 		Password: "",
 		DB:       0,
 	})

@@ -32,7 +32,7 @@ func NewServer(c *config.Config, l logger.Logger, db *redis.Client) *Server {
 }
 
 func (s *Server) Run() error {
-	s.log.Info("running server on port ", os.Getenv("PORT"))
+	s.log.Info("running server on port ", s.config.Port)
 
 	repository := repository.NewRepository(s.db)
 	service := service.NewService(s.log, repository)
@@ -40,14 +40,14 @@ func (s *Server) Run() error {
 	controller.NewController(chain, s.handler, service)
 
 	server := &http.Server{
-		Addr:         os.Getenv("PORT"),
+		Addr:         s.config.Port,
 		Handler:      s.handler,
 		ReadTimeout:  time.Second * 15,
 		WriteTimeout: time.Second * 15,
 	}
 
 	go func() {
-		s.log.Info("http server running on port", os.Getenv("PORT"))
+		s.log.Info("http server running on port", s.config.Port)
 		if err := server.ListenAndServe(); err != nil {
 			s.log.Fatal(err)
 		}

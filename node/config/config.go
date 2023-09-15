@@ -1,8 +1,22 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"os"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
+	*Server
+	*DB
+}
+
+type Server struct {
+	Port string
+}
+
+type DB struct {
+	DSN string
 }
 
 func LoadConfig(configPath string) (*Config, error) {
@@ -15,7 +29,17 @@ func LoadConfig(configPath string) (*Config, error) {
 		return nil, err
 	}
 
-	var c *Config
-	err := v.Unmarshal(&c)
-	return c, err
+	c := Config{
+		Server: &Server{},
+		DB:     &DB{},
+	}
+	if err := v.Unmarshal(&c); err != nil {
+		return nil, err
+	}
+
+	// env config
+	c.Port = os.Getenv("PORT")
+	c.DSN = os.Getenv("DB_DSN")
+
+	return &c, nil
 }
