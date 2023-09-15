@@ -49,23 +49,24 @@ func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 	return &blockchain
 }
 
-func (s *service) AddBlock(ctx context.Context, data string) error {
+func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, data string) (*domain.Block, error) {
 	var lastHash []byte
 
 	val, err := s.repository.Get(ctx, redisKeyCurrentHash)
 	if err != nil {
 		s.log.Error(err)
-		return err
+		return nil, err
 	}
 
 	lastHash = append(lastHash, val...)
 	newBlock := domain.NewBlock(data, lastHash)
 	if err := s.repository.Add(ctx, redisKeyCurrentHash, newBlock); err != nil {
 		s.log.Error(err)
-		return err
+		return nil, err
 	}
+	blockchain.CurrentHash = newBlock.Hash
 
-	return nil
+	return newBlock, nil
 }
 
 func (s *service) GetBlock(ctx context.Context, blockchain *domain.Blockchain) (*domain.Block, error) {

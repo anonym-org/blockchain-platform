@@ -12,6 +12,7 @@ import (
 	"github.com/BakuPukul/blockchain-platform/internal/blockchain/repository"
 	"github.com/BakuPukul/blockchain-platform/internal/blockchain/service"
 	"github.com/BakuPukul/blockchain-platform/pkg/logger"
+	"github.com/BakuPukul/blockchain-platform/pkg/network"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -37,7 +38,8 @@ func (s *Server) Run() error {
 	repository := repository.NewRepository(s.db)
 	service := service.NewService(s.log, repository)
 	chain := service.InitBlockchain(context.TODO())
-	controller.NewController(chain, s.handler, service)
+	network := network.NewNetwork()
+	controller.NewController(*s.config, chain, s.handler, service, network)
 
 	server := &http.Server{
 		Addr:         s.config.Port,

@@ -16,6 +16,10 @@ type Block struct {
 	Nounce   int    `json:"nounce"`
 }
 
+type BlockDTO struct {
+	Data string `json:"data"`
+}
+
 func NewBlock(data string, prevHash []byte) *Block {
 	block := &Block{
 		Hash:     []byte{},
