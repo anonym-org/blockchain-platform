@@ -9,9 +9,9 @@ services:
     depends_on:
       - db-node-1
     ports:
-      - 8080:8080
+      - 8000:8000
     environment:
-      - PORT=:8080
+      - PORT=:8000
       - DB_DSN=db-node-1:6379
     networks:
       - app-network
@@ -21,9 +21,62 @@ services:
     image: redis:7-alpine
     command: redis-server --save 20 1 --loglevel warning
     ports:
-      - 6379:6379
+      - 8001:6379
     volumes:
       - node-1:/data
+    networks:
+      - app-network
+
+  node-2:
+    container_name: node-2
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    depends_on:
+      - db-node-2
+    ports:
+      - 8010:8010
+    environment:
+      - PORT=:8010
+      - DB_DSN=db-node-2:6379
+    networks:
+      - app-network
+
+  db-node-2:
+    container_name: db-node-2
+    image: redis:7-alpine
+    command: redis-server --save 20 1 --loglevel warning
+    ports:
+      - 8011:6379
+    volumes:
+      - node-2:/data
+    networks:
+      - app-network
+
+
+  node-3:
+    container_name: node-3
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    depends_on:
+      - db-node-3
+    ports:
+      - 8020:8020
+    environment:
+      - PORT=:8020
+      - DB_DSN=db-node-3:6379
+    networks:
+      - app-network
+
+  db-node-3:
+    container_name: db-node-3
+    image: redis:7-alpine
+    command: redis-server --save 20 1 --loglevel warning
+    ports:
+      - 8021:6379
+    volumes:
+      - node-3:/data
     networks:
       - app-network
 
@@ -33,4 +86,8 @@ networks:
 
 volumes:
   node-1:
+    driver: local
+  node-2:
+    driver: local
+  node-3:
     driver: local

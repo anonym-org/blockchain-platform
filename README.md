@@ -14,8 +14,14 @@ blockchain network platform
 
 - Adjust nodes service in `compose.yml`
 
-- Start network:
+- Start network (use `--build` tag to apply changes):
 
 ```bash
 docker-compose up -d
+```
+
+- Stop network:
+
+```bash
+docker-compose down
 ```
