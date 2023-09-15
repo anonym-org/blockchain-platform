@@ -13,6 +13,7 @@ services:
     environment:
       - PORT=:8000
       - DB_DSN=db-node-1:6379
+      - NODES=8010,8020
     networks:
       - app-network
 
@@ -39,6 +40,7 @@ services:
     environment:
       - PORT=:8010
       - DB_DSN=db-node-2:6379
+      - NODES=8000,8020
     networks:
       - app-network
 
@@ -66,6 +68,7 @@ services:
     environment:
       - PORT=:8020
       - DB_DSN=db-node-3:6379
+      - NODES=8000,8010
     networks:
       - app-network
 

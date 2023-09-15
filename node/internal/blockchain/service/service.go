@@ -68,7 +68,7 @@ func (s *service) AddBlock(ctx context.Context, data string) error {
 	return nil
 }
 
-func (s *service) Next(ctx context.Context, blockchain *domain.Blockchain) (*domain.Block, error) {
+func (s *service) GetBlock(ctx context.Context, blockchain *domain.Blockchain) (*domain.Block, error) {
 	val, err := s.repository.Get(ctx, string(blockchain.CurrentHash))
 	if err != nil {
 		s.log.Error(err)
@@ -76,7 +76,5 @@ func (s *service) Next(ctx context.Context, blockchain *domain.Blockchain) (*dom
 	}
 
 	block := domain.Deserialize(val)
-	blockchain.CurrentHash = block.PrevHash
-
 	return block, nil
 }

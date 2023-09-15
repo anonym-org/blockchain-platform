@@ -32,7 +32,7 @@ func NewController(blockchain *domain.Blockchain, handler *http.ServeMux, servic
 func (c *controller) getBlocks(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	block, err := c.service.Next(ctx, c.blockchain)
+	block, err := c.service.GetBlock(ctx, c.blockchain)
 	if err != nil {
 		httpresponse.WriteErrorResponse(w, r, http.StatusBadRequest, "fail to get block", "invalid_param")
 		return

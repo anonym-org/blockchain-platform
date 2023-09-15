@@ -2,7 +2,9 @@ package config
 
 import (
 	"os"
+	"strings"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -12,7 +14,8 @@ type Config struct {
 }
 
 type Server struct {
-	Port string
+	Port  string
+	Nodes []string
 }
 
 type DB struct {
@@ -40,6 +43,9 @@ func LoadConfig(configPath string) (*Config, error) {
 	// env config
 	c.Port = os.Getenv("PORT")
 	c.DSN = os.Getenv("DB_DSN")
+	c.Nodes = strings.Split(os.Getenv("NODES"), ",")
+
+	logrus.Info(c.Nodes)
 
 	return &c, nil
 }
