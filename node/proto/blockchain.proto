@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package block;
+
+option go_package = "/proto";
+
+service Blockchain {
+  rpc SendBlock(SendBlockRequest) returns (SendBlockResponse);
+}
+
+message SendBlockRequest {
+  string currentHash = 1;
+  string data = 2;
+};
+
+message SendBlockResponse {};
