@@ -10,7 +10,7 @@ blockchain network platform
 
 ## Development
 
-- Copy `node/config.example.yml` to `node/config.yml`, then adjust your env configuration
+- Copy `node/config/config.example.yml` to `node/config/config.yml`, then adjust your env configuration
 
 - Adjust nodes service in `compose.yml`
 

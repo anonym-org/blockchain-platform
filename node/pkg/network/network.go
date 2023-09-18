@@ -20,8 +20,6 @@ func NewNetwork(conf config.Config, log logger.Logger) *Network {
 }
 
 func (n *Network) Broadcast(block *domain.Block) {
-	n.log.Info(block.PrevHash)
-	n.log.Info(block.Data)
 	for _, v := range n.conf.Nodes {
 		cc, err := grpc.Dial(v, grpc.WithInsecure())
 		if err != nil {
