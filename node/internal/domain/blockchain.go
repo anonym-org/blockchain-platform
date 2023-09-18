@@ -6,13 +6,13 @@ import (
 )
 
 type Blockchain struct {
-	CurrentHash []byte
+	CurrentHash string
 }
 
 type Block struct {
-	Hash     []byte `json:"hash"`
+	Hash     string `json:"hash"`
 	Data     string `json:"data"`
-	PrevHash []byte `json:"prev_hash"`
+	PrevHash string `json:"prev_hash"`
 	Nounce   int    `json:"nounce"`
 }
 
@@ -20,9 +20,9 @@ type BlockDTO struct {
 	Data string `json:"data"`
 }
 
-func NewBlock(data string, prevHash []byte) *Block {
+func NewBlock(data string, prevHash string) *Block {
 	block := &Block{
-		Hash:     []byte{},
+		Hash:     "",
 		Data:     data,
 		PrevHash: prevHash,
 		Nounce:   0,
@@ -36,7 +36,7 @@ func NewBlock(data string, prevHash []byte) *Block {
 }
 
 func Genesis() *Block {
-	return NewBlock("Genesis", []byte{})
+	return NewBlock("Genesis", "")
 }
 
 func (b *Block) Serialize() []byte {

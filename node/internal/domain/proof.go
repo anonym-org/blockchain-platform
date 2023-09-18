@@ -30,7 +30,7 @@ func NewProof(b *Block) *ProofOfWork {
 func (pow *ProofOfWork) InitData(nounce int) (data []byte) {
 	data = bytes.Join(
 		[][]byte{
-			pow.Block.PrevHash,
+			[]byte(pow.Block.PrevHash),
 			[]byte(pow.Block.Data),
 			pow.ToHex(int64(nounce)),
 			pow.ToHex(int64(Difficulty)),
@@ -39,7 +39,7 @@ func (pow *ProofOfWork) InitData(nounce int) (data []byte) {
 	return
 }
 
-func (pow *ProofOfWork) Run() (int, []byte) {
+func (pow *ProofOfWork) Run() (int, string) {
 	var intHash big.Int
 	var hash [32]byte
 
@@ -49,7 +49,6 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 		data := pow.InitData(nounce)
 		hash = sha256.Sum256(data)
 
-		fmt.Printf("\r%x", hash)
 		intHash.SetBytes(hash[:])
 
 		if intHash.Cmp(pow.Target) == -1 {
@@ -58,9 +57,8 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 			nounce++
 		}
 	}
-	fmt.Println()
 
-	return nounce, hash[:]
+	return nounce, bytesToHex(hash[:])
 }
 
 func (pow *ProofOfWork) Validate() bool {
@@ -79,4 +77,8 @@ func (pow *ProofOfWork) ToHex(num int64) []byte {
 		log.Panic(err)
 	}
 	return buff.Bytes()
+}
+
+func bytesToHex(data []byte) string {
+	return fmt.Sprintf("%x", data)
 }

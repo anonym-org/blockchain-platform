@@ -8,21 +8,21 @@ import (
 )
 
 func main() {
-	l := logger.NewLogger()
+	log := logger.NewLogger()
 
-	c, err := config.LoadConfig("config/config")
+	conf, err := config.LoadConfig("config/config")
 	if err != nil {
-		l.Fatal(err)
+		log.Fatal(err)
 	}
 
-	db, err := db.NewRedis(c)
+	db, err := db.NewRedis(conf)
 	if err != nil {
-		l.Fatal(err)
+		log.Fatal(err)
 	}
 
-	s := server.NewServer(c, l, db)
+	s := server.NewServer(conf, log, db)
 	err = s.Run()
 	if err != nil {
-		l.Fatal(err)
+		log.Fatal(err)
 	}
 }
