@@ -9,7 +9,7 @@ service Blockchain {
 }
 
 message SendBlockRequest {
-  string currentHash = 1;
+  string prevHash = 1;
   string data = 2;
 };
 

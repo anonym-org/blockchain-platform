@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	redisKeyCurrentHash = "current_hash"
+	REDIS_KEY_PREVIOUS_HASH = "prev_hash"
 )
 
 type service struct {
@@ -28,14 +28,14 @@ func NewService(log logger.Logger, repository blockchain.Repository) blockchain.
 func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 	var lastHash []byte
 
-	val, err := s.repository.Get(ctx, redisKeyCurrentHash)
+	val, err := s.repository.Get(ctx, REDIS_KEY_PREVIOUS_HASH)
 	if err != nil {
 		if err != redis.Nil {
 			s.log.Fatal(err)
 		}
 
 		genesis := domain.Genesis()
-		if err = s.repository.Add(ctx, redisKeyCurrentHash, genesis); err != nil {
+		if err = s.repository.Add(ctx, REDIS_KEY_PREVIOUS_HASH, genesis); err != nil {
 			s.log.Fatal(err)
 		}
 
@@ -52,7 +52,7 @@ func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, data string) (*domain.Block, error) {
 	var lastHash []byte
 
-	val, err := s.repository.Get(ctx, redisKeyCurrentHash)
+	val, err := s.repository.Get(ctx, REDIS_KEY_PREVIOUS_HASH)
 	if err != nil {
 		s.log.Error(err)
 		return nil, err
@@ -60,7 +60,7 @@ func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, d
 
 	lastHash = append(lastHash, val...)
 	newBlock := domain.NewBlock(data, lastHash)
-	if err := s.repository.Add(ctx, redisKeyCurrentHash, newBlock); err != nil {
+	if err := s.repository.Add(ctx, REDIS_KEY_PREVIOUS_HASH, newBlock); err != nil {
 		s.log.Error(err)
 		return nil, err
 	}
