@@ -10,17 +10,22 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Network struct{}
-
-func NewNetwork() *Network {
-	return &Network{}
+type Network struct {
+	conf config.Config
+	log  logger.Logger
 }
 
-func (n *Network) Broadcast(conf config.Config, log logger.Logger, block *domain.Block) {
-	for _, n := range conf.Nodes {
-		cc, err := grpc.Dial(n, grpc.WithTransportCredentials(nil))
+func NewNetwork(conf config.Config, log logger.Logger) *Network {
+	return &Network{conf: conf, log: log}
+}
+
+func (n *Network) Broadcast(block *domain.Block) {
+	n.log.Info(block.PrevHash)
+	n.log.Info(block.Data)
+	for _, v := range n.conf.Nodes {
+		cc, err := grpc.Dial(v, grpc.WithInsecure())
 		if err != nil {
-			log.Error("err dial node: ", err)
+			n.log.Error("err dial node: ", err)
 			continue
 		}
 		defer cc.Close()
@@ -28,14 +33,14 @@ func (n *Network) Broadcast(conf config.Config, log logger.Logger, block *domain
 		node := proto.NewBlockchainClient(cc)
 
 		_, err = node.SendBlock(context.Background(), &proto.SendBlockRequest{
-			PrevHash: string(block.PrevHash),
+			PrevHash: block.PrevHash,
 			Data:     block.Data,
 		})
 		if err != nil {
-			log.Warn("fail to broadcast data: ", err)
+			n.log.Warn("fail to broadcast data: ", err)
 			continue
 		}
 
-		log.Info("broadcast data sent")
+		n.log.Info("broadcast data sent")
 	}
 }

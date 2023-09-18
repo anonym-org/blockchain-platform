@@ -26,7 +26,7 @@ func NewService(log logger.Logger, repository blockchain.Repository) blockchain.
 }
 
 func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
-	var lastHash []byte
+	var prevHash string
 
 	val, err := s.repository.Get(ctx, REDIS_KEY_PREVIOUS_HASH)
 	if err != nil {
@@ -39,27 +39,25 @@ func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 			s.log.Fatal(err)
 		}
 
-		lastHash = genesis.Hash
+		prevHash = genesis.Hash
+	} else {
+		prevHash = val
 	}
 
-	lastHash = append(lastHash, []byte(val)...)
 	blockchain := domain.Blockchain{
-		CurrentHash: lastHash,
+		CurrentHash: prevHash,
 	}
 	return &blockchain
 }
 
 func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, data string) (*domain.Block, error) {
-	var lastHash []byte
-
-	val, err := s.repository.Get(ctx, REDIS_KEY_PREVIOUS_HASH)
+	prevHash, err := s.repository.Get(ctx, REDIS_KEY_PREVIOUS_HASH)
 	if err != nil {
 		s.log.Error(err)
 		return nil, err
 	}
 
-	lastHash = append(lastHash, val...)
-	newBlock := domain.NewBlock(data, lastHash)
+	newBlock := domain.NewBlock(data, prevHash)
 	if err := s.repository.Add(ctx, REDIS_KEY_PREVIOUS_HASH, newBlock); err != nil {
 		s.log.Error(err)
 		return nil, err
@@ -70,12 +68,12 @@ func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, d
 }
 
 func (s *service) GetBlock(ctx context.Context, blockchain *domain.Blockchain) (*domain.Block, error) {
-	val, err := s.repository.Get(ctx, string(blockchain.CurrentHash))
+	val, err := s.repository.Get(ctx, blockchain.CurrentHash)
 	if err != nil {
 		s.log.Error(err)
 		return nil, err
 	}
 
-	block := domain.Deserialize(val)
+	block := domain.Deserialize([]byte(val))
 	return block, nil
 }

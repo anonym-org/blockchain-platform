@@ -16,19 +16,18 @@ func NewRepository(db *redis.Client) blockchain.Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) Get(ctx context.Context, key string) ([]byte, error) {
+func (r *repository) Get(ctx context.Context, key string) (string, error) {
 	v, err := r.db.Get(ctx, key).Result()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-
-	return []byte(v), nil
+	return v, nil
 }
 
 func (r *repository) Add(ctx context.Context, currentHashKey string, block *domain.Block) error {
 	tx := r.db.TxPipeline()
 
-	tx.Set(ctx, string(block.Hash), block.Serialize(), 0)
+	tx.Set(ctx, block.Hash, block.Serialize(), 0)
 	tx.Set(ctx, currentHashKey, block.Hash, 0)
 
 	_, err := tx.Exec(ctx)

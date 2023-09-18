@@ -7,6 +7,6 @@ import (
 )
 
 type Repository interface {
-	Get(ctx context.Context, key string) ([]byte, error)
+	Get(ctx context.Context, key string) (string, error)
 	Add(ctx context.Context, currentHashKey string, block *domain.Block) error
 }

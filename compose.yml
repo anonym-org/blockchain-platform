@@ -12,8 +12,9 @@ services:
       - 8000:8000
     environment:
       - PORT=:8000
+      - GRPC_PORT=:8001
       - DB_DSN=db-node-1:6379
-      - NODES=node-2:8010,node-3:8020
+      - NODES=node-2:8011,node-3:8021
     networks:
       - app-network
 
@@ -22,7 +23,7 @@ services:
     image: redis:7-alpine
     command: redis-server --save 20 1 --loglevel warning
     ports:
-      - 8001:6379
+      - 8002:6379
     volumes:
       - node-1:/data
     networks:
@@ -39,8 +40,9 @@ services:
       - 8010:8010
     environment:
       - PORT=:8010
+      - GRPC_PORT=:8011
       - DB_DSN=db-node-2:6379
-      - NODES=node-1:8000,node-3:8020
+      - NODES=node-1:8001,node-3:8021
     networks:
       - app-network
 
@@ -49,7 +51,7 @@ services:
     image: redis:7-alpine
     command: redis-server --save 20 1 --loglevel warning
     ports:
-      - 8011:6379
+      - 8012:6379
     volumes:
       - node-2:/data
     networks:
@@ -67,8 +69,9 @@ services:
       - 8020:8020
     environment:
       - PORT=:8020
+      - GRPC_PORT=:8021
       - DB_DSN=db-node-3:6379
-      - NODES=node-1:8000,node-2:8010
+      - NODES=node-1:8001,node-2:8011
     networks:
       - app-network
 
@@ -77,7 +80,7 @@ services:
     image: redis:7-alpine
     command: redis-server --save 20 1 --loglevel warning
     ports:
-      - 8021:6379
+      - 8022:6379
     volumes:
       - node-3:/data
     networks:

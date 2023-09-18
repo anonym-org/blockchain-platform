@@ -1,4 +1,4 @@
-package controller
+package http
 
 import (
 	"encoding/json"
@@ -9,24 +9,24 @@ import (
 	"github.com/BakuPukul/blockchain-platform/internal/blockchain"
 	"github.com/BakuPukul/blockchain-platform/internal/domain"
 	httpresponse "github.com/BakuPukul/blockchain-platform/pkg/http-response"
-	"github.com/BakuPukul/blockchain-platform/pkg/logger"
 	"github.com/BakuPukul/blockchain-platform/pkg/network"
 )
 
 type controller struct {
 	config     config.Config
-	log        logger.Logger
 	blockchain *domain.Blockchain
 	handler    *http.ServeMux
 	service    blockchain.Usecase
 	network    *network.Network
 }
 
-func NewController(config config.Config, log logger.Logger, blockchain *domain.Blockchain, handler *http.ServeMux, service blockchain.Usecase, network *network.Network) {
+func NewController(config config.Config, blockchain *domain.Blockchain, handler *http.ServeMux, service blockchain.Usecase, network *network.Network) {
 	c := &controller{
+		config:     config,
 		blockchain: blockchain,
 		handler:    handler,
 		service:    service,
+		network:    network,
 	}
 
 	handler.HandleFunc("/api/blocks", func(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +73,6 @@ func (c *controller) addBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c.network.Broadcast(c.config, c.log, block)
+	c.network.Broadcast(block)
 	httpresponse.WriteSuccessResponse(w, r, http.StatusCreated, "data added to blockchain", block.Data)
 }
