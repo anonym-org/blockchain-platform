@@ -36,7 +36,6 @@ func (h *handler) SendBlock(ctx context.Context, r *proto.SendBlockRequest) (*pr
 		return &proto.SendBlockResponse{}, status.Error(codes.Internal, "fail to get node blockchain")
 	}
 
-	h.log.Info("compare: ", block.Hash, " with req: ", r.PrevHash)
 	if block.Hash != r.PrevHash {
 		h.log.Error("node blockchain were invalid, will copy full blockchain from node")
 		// TODO: copy full blockchain from other node
