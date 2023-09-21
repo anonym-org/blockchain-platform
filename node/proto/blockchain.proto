@@ -6,6 +6,7 @@ option go_package = "/proto";
 
 service Blockchain {
   rpc SendBlock(SendBlockRequest) returns (SendBlockResponse);
+  rpc CopyBlockchain(CopyBlockchainRequest) returns (CopyBlockchainResponse);
 }
 
 message SendBlockRequest {
@@ -14,3 +15,16 @@ message SendBlockRequest {
 };
 
 message SendBlockResponse {};
+
+message CopyBlockchainRequest {};
+
+message CopyBlockchainResponse {
+  string currentHash = 1;
+  repeated Block blocks = 2;
+};
+
+message Block {
+  string hash = 1;
+  string data = 2;
+  string prevHash = 3;
+}

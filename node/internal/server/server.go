@@ -13,6 +13,7 @@ import (
 	_http "github.com/BakuPukul/blockchain-platform/internal/blockchain/delivery/http"
 	"github.com/BakuPukul/blockchain-platform/internal/blockchain/repository"
 	"github.com/BakuPukul/blockchain-platform/internal/blockchain/service"
+	"github.com/BakuPukul/blockchain-platform/internal/domain"
 	"github.com/BakuPukul/blockchain-platform/pkg/logger"
 	"github.com/BakuPukul/blockchain-platform/pkg/network"
 	"github.com/BakuPukul/blockchain-platform/proto"
@@ -26,6 +27,7 @@ type Server struct {
 	db      *redis.Client
 	handler *http.ServeMux
 	gs      *grpc.Server
+	Chain   *domain.Blockchain
 }
 
 func NewServer(c *config.Config, l logger.Logger, db *redis.Client) *Server {
@@ -39,13 +41,13 @@ func NewServer(c *config.Config, l logger.Logger, db *redis.Client) *Server {
 }
 
 func (s *Server) Run() error {
-	repository := repository.NewRepository(s.db)
+	repository := repository.NewRepository(s.config, s.db)
 	service := service.NewService(s.log, repository)
-	chain := service.InitBlockchain(context.TODO())
+	s.Chain = service.InitBlockchain(context.TODO())
 	network := network.NewNetwork(*s.config, s.log)
 
-	_http.NewController(*s.config, chain, s.handler, service, network)
-	srv := _grpc.NewHandler(*s.config, s.log, chain, service)
+	_http.NewController(*s.config, s.Chain, s.handler, service, network)
+	srv := _grpc.NewHandler(*s.config, s.log, s.Chain, service, network)
 
 	proto.RegisterBlockchainServer(s.gs, srv)
 	grpcListener, err := net.Listen("tcp", s.config.GrpcPort)

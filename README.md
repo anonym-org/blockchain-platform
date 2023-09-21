@@ -5,6 +5,9 @@ blockchain network platform
 ## Tech Stacks
 
 - Go
+- NodeJS
+- Redis
+- Nginx
 
 ---
 

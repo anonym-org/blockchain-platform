@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BlockchainClient interface {
 	SendBlock(ctx context.Context, in *SendBlockRequest, opts ...grpc.CallOption) (*SendBlockResponse, error)
+	CopyBlockchain(ctx context.Context, in *CopyBlockchainRequest, opts ...grpc.CallOption) (*CopyBlockchainResponse, error)
 }
 
 type blockchainClient struct {
@@ -42,11 +43,21 @@ func (c *blockchainClient) SendBlock(ctx context.Context, in *SendBlockRequest, 
 	return out, nil
 }
 
+func (c *blockchainClient) CopyBlockchain(ctx context.Context, in *CopyBlockchainRequest, opts ...grpc.CallOption) (*CopyBlockchainResponse, error) {
+	out := new(CopyBlockchainResponse)
+	err := c.cc.Invoke(ctx, "/block.Blockchain/CopyBlockchain", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BlockchainServer is the server API for Blockchain service.
 // All implementations must embed UnimplementedBlockchainServer
 // for forward compatibility
 type BlockchainServer interface {
 	SendBlock(context.Context, *SendBlockRequest) (*SendBlockResponse, error)
+	CopyBlockchain(context.Context, *CopyBlockchainRequest) (*CopyBlockchainResponse, error)
 	mustEmbedUnimplementedBlockchainServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedBlockchainServer struct {
 
 func (UnimplementedBlockchainServer) SendBlock(context.Context, *SendBlockRequest) (*SendBlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendBlock not implemented")
+}
+func (UnimplementedBlockchainServer) CopyBlockchain(context.Context, *CopyBlockchainRequest) (*CopyBlockchainResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CopyBlockchain not implemented")
 }
 func (UnimplementedBlockchainServer) mustEmbedUnimplementedBlockchainServer() {}
 
@@ -88,6 +102,24 @@ func _Blockchain_SendBlock_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Blockchain_CopyBlockchain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CopyBlockchainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockchainServer).CopyBlockchain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/block.Blockchain/CopyBlockchain",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockchainServer).CopyBlockchain(ctx, req.(*CopyBlockchainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Blockchain_ServiceDesc is the grpc.ServiceDesc for Blockchain service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var Blockchain_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendBlock",
 			Handler:    _Blockchain_SendBlock_Handler,
+		},
+		{
+			MethodName: "CopyBlockchain",
+			Handler:    _Blockchain_CopyBlockchain_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
