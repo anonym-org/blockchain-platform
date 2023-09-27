@@ -1,4 +1,4 @@
-module github.com/BakuPukul/blockchain-platform
+module github.com/anonym-org/blockchain-platform
 
 go 1.21.0
 

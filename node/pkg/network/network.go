@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/BakuPukul/blockchain-platform/config"
-	"github.com/BakuPukul/blockchain-platform/internal/domain"
-	"github.com/BakuPukul/blockchain-platform/pkg/logger"
-	"github.com/BakuPukul/blockchain-platform/proto"
+	"github.com/anonym-org/blockchain-platform/config"
+	"github.com/anonym-org/blockchain-platform/internal/domain"
+	"github.com/anonym-org/blockchain-platform/pkg/logger"
+	"github.com/anonym-org/blockchain-platform/proto"
 	"google.golang.org/grpc"
 )
 

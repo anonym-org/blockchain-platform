@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/BakuPukul/blockchain-platform/internal/blockchain"
-	"github.com/BakuPukul/blockchain-platform/internal/domain"
-	"github.com/BakuPukul/blockchain-platform/pkg/logger"
-	"github.com/BakuPukul/blockchain-platform/proto"
+	"github.com/anonym-org/blockchain-platform/internal/blockchain"
+	"github.com/anonym-org/blockchain-platform/internal/domain"
+	"github.com/anonym-org/blockchain-platform/pkg/logger"
+	"github.com/anonym-org/blockchain-platform/proto"
 	"github.com/redis/go-redis/v9"
 )
 

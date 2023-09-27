@@ -5,11 +5,11 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/BakuPukul/blockchain-platform/config"
-	"github.com/BakuPukul/blockchain-platform/internal/blockchain"
-	"github.com/BakuPukul/blockchain-platform/internal/domain"
-	httpresponse "github.com/BakuPukul/blockchain-platform/pkg/http-response"
-	"github.com/BakuPukul/blockchain-platform/pkg/network"
+	"github.com/anonym-org/blockchain-platform/config"
+	"github.com/anonym-org/blockchain-platform/internal/blockchain"
+	"github.com/anonym-org/blockchain-platform/internal/domain"
+	httpresponse "github.com/anonym-org/blockchain-platform/pkg/http-response"
+	"github.com/anonym-org/blockchain-platform/pkg/network"
 )
 
 type controller struct {

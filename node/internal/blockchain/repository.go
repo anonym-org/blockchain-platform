@@ -3,7 +3,7 @@ package blockchain
 import (
 	"context"
 
-	"github.com/BakuPukul/blockchain-platform/internal/domain"
+	"github.com/anonym-org/blockchain-platform/internal/domain"
 )
 
 type Repository interface {

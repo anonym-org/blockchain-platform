@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 
-	"github.com/BakuPukul/blockchain-platform/config"
-	"github.com/BakuPukul/blockchain-platform/internal/blockchain"
-	"github.com/BakuPukul/blockchain-platform/internal/domain"
-	"github.com/BakuPukul/blockchain-platform/pkg/db"
+	"github.com/anonym-org/blockchain-platform/config"
+	"github.com/anonym-org/blockchain-platform/internal/blockchain"
+	"github.com/anonym-org/blockchain-platform/internal/domain"
+	"github.com/anonym-org/blockchain-platform/pkg/db"
 	"github.com/redis/go-redis/v9"
 )
 

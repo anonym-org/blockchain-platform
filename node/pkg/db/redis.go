@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/BakuPukul/blockchain-platform/config"
+	"github.com/anonym-org/blockchain-platform/config"
 	"github.com/redis/go-redis/v9"
 )
 

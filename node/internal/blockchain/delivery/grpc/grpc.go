@@ -3,12 +3,12 @@ package grpc
 import (
 	"context"
 
-	"github.com/BakuPukul/blockchain-platform/config"
-	"github.com/BakuPukul/blockchain-platform/internal/blockchain"
-	"github.com/BakuPukul/blockchain-platform/internal/domain"
-	"github.com/BakuPukul/blockchain-platform/pkg/logger"
-	"github.com/BakuPukul/blockchain-platform/pkg/network"
-	"github.com/BakuPukul/blockchain-platform/proto"
+	"github.com/anonym-org/blockchain-platform/config"
+	"github.com/anonym-org/blockchain-platform/internal/blockchain"
+	"github.com/anonym-org/blockchain-platform/internal/domain"
+	"github.com/anonym-org/blockchain-platform/pkg/logger"
+	"github.com/anonym-org/blockchain-platform/pkg/network"
+	"github.com/anonym-org/blockchain-platform/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

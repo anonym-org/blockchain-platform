@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/BakuPukul/blockchain-platform/config"
-	"github.com/BakuPukul/blockchain-platform/internal/server"
-	"github.com/BakuPukul/blockchain-platform/pkg/db"
-	"github.com/BakuPukul/blockchain-platform/pkg/logger"
+	"github.com/anonym-org/blockchain-platform/config"
+	"github.com/anonym-org/blockchain-platform/internal/server"
+	"github.com/anonym-org/blockchain-platform/pkg/db"
+	"github.com/anonym-org/blockchain-platform/pkg/logger"
 )
 
 func main() {
