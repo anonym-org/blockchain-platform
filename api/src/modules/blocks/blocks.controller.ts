@@ -6,13 +6,21 @@ import { BlocksService } from './blocks.service';
 @ApiTags('Blocks')
 @Controller('blocks')
 export class BlocksController {
+  private readonly logger = new Logger();
   constructor(private readonly blocksService: BlocksService) {}
 
   @Get()
-  async findAllBlocks(): Promise<any> {
-    return await this.blocksService.findAll();
+  async findOneLatestBlock(): Promise<any> {
+    return this.blocksService.findLatest();
   }
 
   @Post()
-  async createBlocks(@Body() createDto: CreateDto): Promise<any> {}
+  async createBlock(@Body() createDto: CreateDto): Promise<any> {
+    return this.blocksService.create(createDto);
+  }
+
+  @Get('/history')
+  async findAllBlockchains(): Promise<any> {
+    return this.blocksService.findAll();
+  }
 }

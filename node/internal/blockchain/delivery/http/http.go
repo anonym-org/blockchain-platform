@@ -37,6 +37,13 @@ func NewController(config config.Config, blockchain *domain.Blockchain, handler 
 			c.addBlock(w, r)
 		}
 	})
+
+	handler.HandleFunc("/api/blockchains", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			c.getListBlocks(w, r)
+		}
+	})
 }
 
 func (c *controller) getBlocks(w http.ResponseWriter, r *http.Request) {
@@ -76,3 +83,16 @@ func (c *controller) addBlock(w http.ResponseWriter, r *http.Request) {
 	c.network.Broadcast(block)
 	httpresponse.WriteSuccessResponse(w, r, http.StatusCreated, "data added to blockchain", block.Data)
 }
+
+func (c *controller) getListBlocks(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	_, blocks, err := c.service.ListBlocks(ctx, c.blockchain)
+	if err != nil {
+		httpresponse.WriteErrorResponse(w, r, http.StatusBadRequest, "fail to get list blocks", "invalid_param")
+		return
+	}
+
+	httpresponse.WriteSuccessResponse(w, r, http.StatusOK, "get list blocks from blockchain", blocks)
+}
+
