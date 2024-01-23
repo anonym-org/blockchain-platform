@@ -27,4 +27,5 @@ message Block {
   string hash = 1;
   string data = 2;
   string prevHash = 3;
+  int64 nounce = 4;
 }
