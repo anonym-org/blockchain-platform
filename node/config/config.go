@@ -3,8 +3,6 @@ package config
 import (
 	"os"
 	"strings"
-
-	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -23,21 +21,9 @@ type DB struct {
 }
 
 func LoadConfig(configPath string) (*Config, error) {
-	v := viper.New()
-	v.SetConfigName(configPath)
-	v.AddConfigPath(".")
-	v.AutomaticEnv()
-
-	if err := v.ReadInConfig(); err != nil {
-		return nil, err
-	}
-
 	c := Config{
 		Server: &Server{},
 		DB:     &DB{},
-	}
-	if err := v.Unmarshal(&c); err != nil {
-		return nil, err
 	}
 
 	// env config

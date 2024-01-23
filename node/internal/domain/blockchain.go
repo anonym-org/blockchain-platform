@@ -16,6 +16,10 @@ type Block struct {
 	Nounce   int    `json:"nounce"`
 }
 
+type GenesisDTO struct {
+	ID string `json:"id"`
+}
+
 type BlockDTO struct {
 	Data string `json:"data"`
 }
@@ -36,7 +40,18 @@ func NewBlock(data string, prevHash string) *Block {
 }
 
 func Genesis() *Block {
-	return NewBlock("Genesis", "")
+	g := struct {
+		Data any `json:"data"`
+	}{
+		Data: GenesisDTO{
+			ID: "Genesis",
+		},
+	}
+	v, err := json.Marshal(g)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return NewBlock(string(v), "")
 }
 
 func (b *Block) Serialize() []byte {

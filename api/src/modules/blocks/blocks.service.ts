@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
+import axios, { AxiosError } from 'axios';
 import { catchError, map } from 'rxjs';
 
 @Injectable()
@@ -13,7 +14,11 @@ export class BlocksService {
 
       const res = this.httpService
         .get('http://nginx/api/blocks')
-        .pipe(map((res) => res.data))
+        .pipe(map((res) => {
+          const { data } = res.data
+          res.data.data = JSON.parse(data ?? "{}")?.data
+          return res.data
+        }))
         .pipe(
           catchError((error) => {
             this.logger.error(error);
@@ -32,8 +37,12 @@ export class BlocksService {
       this.logger.log(`-- CREATE --`);
 
       const res = this.httpService
-        .post('http://nginx/api/blocks', data)
-        .pipe(map((res) => res.data))
+        .post('http://nginx/api/blocks', { data: JSON.stringify(data) })
+        .pipe(map((res) => {
+          const { data } = res.data
+          res.data.data = JSON.parse(data ?? "{}")?.data
+          return res.data
+        }))
         .pipe(
           catchError((error) => {
             this.logger.error(error);
@@ -53,7 +62,13 @@ export class BlocksService {
 
       const res = this.httpService
         .get('http://nginx/api/blockchains')
-        .pipe(map((res) => res.data))
+        .pipe(map((res) => {
+          const { data } = res.data
+          res.data.data = data.map((block) => 
+            JSON.parse(block.data ?? "{}").data
+          )
+          return res.data
+        }))
         .pipe(
           catchError((error) => {
             this.logger.error(error);

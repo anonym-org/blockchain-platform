@@ -7,11 +7,11 @@ import (
 	"github.com/anonym-org/blockchain-platform/internal/domain"
 	"github.com/anonym-org/blockchain-platform/pkg/logger"
 	"github.com/anonym-org/blockchain-platform/proto"
-	"github.com/redis/go-redis/v9"
+	"github.com/dgraph-io/badger/v4"
 )
 
 const (
-	REDIS_KEY_CURRENT_HASH = "current_hash"
+	CurrentHashKey = "current_hash"
 )
 
 type service struct {
@@ -29,14 +29,15 @@ func NewService(log logger.Logger, repository blockchain.Repository) blockchain.
 func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 	var prevHash string
 
-	val, err := s.repository.Get(ctx, REDIS_KEY_CURRENT_HASH)
+	val, err := s.repository.Get(ctx, CurrentHashKey)
 	if err != nil {
-		if err != redis.Nil {
+		if err != badger.ErrKeyNotFound {
 			s.log.Fatal(err)
 		}
 
 		genesis := domain.Genesis()
-		if err = s.repository.Add(ctx, REDIS_KEY_CURRENT_HASH, genesis); err != nil {
+		s.log.Info(genesis)
+		if err = s.repository.Add(ctx, CurrentHashKey, genesis); err != nil {
 			s.log.Fatal(err)
 		}
 
@@ -52,14 +53,14 @@ func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 }
 
 func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, data string) (*domain.Block, error) {
-	prevHash, err := s.repository.Get(ctx, REDIS_KEY_CURRENT_HASH)
+	prevHash, err := s.repository.Get(ctx, CurrentHashKey)
 	if err != nil {
 		s.log.Error(err)
 		return nil, err
 	}
 
 	newBlock := domain.NewBlock(data, prevHash)
-	if err := s.repository.Add(ctx, REDIS_KEY_CURRENT_HASH, newBlock); err != nil {
+	if err := s.repository.Add(ctx, CurrentHashKey, newBlock); err != nil {
 		s.log.Error(err)
 		return nil, err
 	}
@@ -91,7 +92,7 @@ func (s *service) ReplaceBlockchain(ctx context.Context, blockchain *proto.CopyB
 	}
 
 	for i, b := range blockchain.Blocks {
-		if err := s.repository.Add(ctx, REDIS_KEY_CURRENT_HASH, &domain.Block{
+		if err := s.repository.Add(ctx, CurrentHashKey, &domain.Block{
 			Hash:     b.Hash,
 			Data:     b.Data,
 			PrevHash: b.PrevHash,
@@ -105,7 +106,7 @@ func (s *service) ReplaceBlockchain(ctx context.Context, blockchain *proto.CopyB
 		}
 	}
 
-	s.repository.Set(ctx, REDIS_KEY_CURRENT_HASH, currentHash)
+	s.repository.Set(ctx, CurrentHashKey, currentHash)
 
 	return nil
 }

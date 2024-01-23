@@ -37,8 +37,6 @@ services:
     build:
       context: ./node
       dockerfile: Dockerfile
-    depends_on:
-      - db-node-1
     ports:
       - 8000:8000
     environment:
@@ -49,24 +47,11 @@ services:
     networks:
       - app-network
 
-  db-node-1:
-    container_name: db-node-1
-    image: redis:7-alpine
-    command: redis-server --save 20 1 --loglevel warning
-    ports:
-      - 8002:6379
-    volumes:
-      - node-1:/data
-    networks:
-      - app-network
-
   node-2:
     container_name: node-2
     build:
       context: ./node
       dockerfile: Dockerfile
-    depends_on:
-      - db-node-2
     ports:
       - 8010:8010
     environment:
@@ -77,24 +62,11 @@ services:
     networks:
       - app-network
 
-  db-node-2:
-    container_name: db-node-2
-    image: redis:7-alpine
-    command: redis-server --save 20 1 --loglevel warning
-    ports:
-      - 8012:6379
-    volumes:
-      - node-2:/data
-    networks:
-      - app-network
-
   node-3:
     container_name: node-3
     build:
       context: ./node
       dockerfile: Dockerfile
-    depends_on:
-      - db-node-3
     ports:
       - 8020:8020
     environment:
@@ -102,17 +74,6 @@ services:
       - GRPC_PORT=:8021
       - DB_DSN=db-node-3:6379
       - NODES=node-1:8001,node-2:8011
-    networks:
-      - app-network
-
-  db-node-3:
-    container_name: db-node-3
-    image: redis:7-alpine
-    command: redis-server --save 20 1 --loglevel warning
-    ports:
-      - 8022:6379
-    volumes:
-      - node-3:/data
     networks:
       - app-network
 

@@ -17,20 +17,20 @@ import (
 	"github.com/anonym-org/blockchain-platform/pkg/logger"
 	"github.com/anonym-org/blockchain-platform/pkg/network"
 	"github.com/anonym-org/blockchain-platform/proto"
-	"github.com/redis/go-redis/v9"
+	"github.com/dgraph-io/badger/v4"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
 	config  *config.Config
 	log     logger.Logger
-	db      *redis.Client
+	db      *badger.DB
 	handler *http.ServeMux
 	gs      *grpc.Server
 	Chain   *domain.Blockchain
 }
 
-func NewServer(c *config.Config, l logger.Logger, db *redis.Client) *Server {
+func NewServer(c *config.Config, l logger.Logger, db *badger.DB) *Server {
 	return &Server{
 		config:  c,
 		log:     l,

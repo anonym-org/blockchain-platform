@@ -2,60 +2,59 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/anonym-org/blockchain-platform/config"
 	"github.com/anonym-org/blockchain-platform/internal/blockchain"
 	"github.com/anonym-org/blockchain-platform/internal/domain"
-	"github.com/anonym-org/blockchain-platform/pkg/db"
-	"github.com/redis/go-redis/v9"
+	"github.com/dgraph-io/badger/v4"
 )
 
 type repository struct {
 	conf *config.Config
-	db   *redis.Client
+	db   *badger.DB
 }
 
-func NewRepository(conf *config.Config, db *redis.Client) blockchain.Repository {
+func NewRepository(conf *config.Config, db *badger.DB) blockchain.Repository {
 	return &repository{conf: conf, db: db}
 }
 
 func (r *repository) Get(ctx context.Context, key string) (string, error) {
-	v, err := r.db.Get(ctx, key).Result()
-	if err != nil {
-		return "", err
-	}
-	return v, nil
+	var result string
+	err := r.db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
+		if err != nil {
+			return err
+		}
+		err = item.Value(func(val []byte) error {
+			result = string(val[:])
+			return nil
+		})
+		return err
+	})
+	return result, err
 }
 
 func (r *repository) Add(ctx context.Context, currentHashKey string, block *domain.Block) error {
-	tx := r.db.TxPipeline()
-
-	tx.Set(ctx, block.Hash, block.Serialize(), 0)
-	tx.Set(ctx, currentHashKey, block.Hash, 0)
-
-	_, err := tx.Exec(ctx)
-	return err
+	return r.db.Update(func(txn *badger.Txn) error {
+		if err := txn.Set([]byte(block.Hash), block.Serialize()); err != nil {
+			return err
+		}
+		err := txn.Set([]byte(currentHashKey), []byte(block.Hash))
+		return err
+	})
 }
 
 func (r *repository) Set(ctx context.Context, key string, val any) error {
-	_, err := r.db.Set(ctx, key, val, 0).Result()
-	return err
+	return r.db.Update(func(txn *badger.Txn) error {
+		v, err := json.Marshal(val)
+		if err != nil {
+			return err
+		}
+		return txn.Set([]byte(key), v)
+	})
 }
 
 func (r *repository) Clear(ctx context.Context) error {
-	if err := r.db.FlushDB(ctx).Err(); err != nil {
-		return err
-	}
-	if err := r.db.Close(); err != nil {
-		return err
-	}
-
-	client, err := db.NewRedis(r.conf)
-	if err != nil {
-		return err
-	}
-
-	r.db = client
-
-	return r.db.Do(context.Background(), "SELECT", 0).Err()
+	return r.db.DropAll()
 }
