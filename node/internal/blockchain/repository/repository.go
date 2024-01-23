@@ -56,5 +56,20 @@ func (r *repository) Set(ctx context.Context, key string, val any) error {
 }
 
 func (r *repository) Clear(ctx context.Context) error {
-	return r.db.DropAll()
+	return r.db.Update(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
+
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			err := txn.Delete(it.Item().Key())
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 }

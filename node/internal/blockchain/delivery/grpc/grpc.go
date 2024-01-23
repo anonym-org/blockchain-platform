@@ -33,13 +33,12 @@ func NewHandler(conf config.Config, log logger.Logger, blockchain *domain.Blockc
 }
 
 func (h *handler) SendBlock(ctx context.Context, r *proto.SendBlockRequest) (*proto.SendBlockResponse, error) {
-	block, err := h.service.GetBlock(ctx, h.blockchain)
+	isValid, err := h.ValidateBlockchain(ctx)
 	if err != nil {
-		h.log.Error("fail to get node blockchain")
-		return &proto.SendBlockResponse{}, status.Error(codes.Internal, "fail to get node blockchain")
+		return &proto.SendBlockResponse{}, nil
 	}
 
-	if block.Hash != r.PrevHash {
+	if !isValid {
 		h.log.Error("node blockchain were invalid, will copy full blockchain from nodes")
 
 		chain, err := h.network.DownloadBlockchain(h.conf, h.log)
@@ -55,7 +54,7 @@ func (h *handler) SendBlock(ctx context.Context, r *proto.SendBlockRequest) (*pr
 		return &proto.SendBlockResponse{}, status.Error(codes.Internal, "node blockchain were invalid, will copy full blockchain from nodes")
 	}
 
-	if _, err = h.service.AddBlock(ctx, h.blockchain, r.Data); err != nil {
+	if _, err := h.service.AddBlock(ctx, h.blockchain, r.Data); err != nil {
 		h.log.Error("fail to add block into node blockchain")
 		return &proto.SendBlockResponse{}, status.Error(codes.Internal, "fail to add block into node blockchain")
 	}
@@ -74,4 +73,33 @@ func (h *handler) CopyBlockchain(context.Context, *proto.CopyBlockchainRequest) 
 		CurrentHash: currentHash,
 		Blocks:      blocks,
 	}, nil
+}
+
+func (h *handler) ValidateBlockchain(ctx context.Context) (bool, error) {
+	_, blocks, err := h.service.ListBlocks(ctx, h.blockchain)
+	if err != nil {
+		return false, err
+	}
+
+	reversed := make([]*proto.Block, len(blocks))
+	for i, block := range blocks {
+		reversed[len(blocks)-(i+1)] = &proto.Block{
+			Hash:     block.Hash,
+			Data:     block.Data,
+			PrevHash: block.PrevHash,
+		}
+	}
+
+	hash := h.blockchain.GenesisHash
+	for i, block := range reversed {
+		// skip genesis block
+		if i == 0 {
+			continue
+		}
+		if block.PrevHash != hash {
+			return false, nil
+		}
+		hash = block.Hash
+	}
+	return true, nil
 }

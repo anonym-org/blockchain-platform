@@ -6,6 +6,7 @@ import (
 )
 
 type Blockchain struct {
+	GenesisHash string
 	CurrentHash string
 }
 

@@ -29,13 +29,13 @@ func NewService(log logger.Logger, repository blockchain.Repository) blockchain.
 func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 	var prevHash string
 
+	genesis := domain.Genesis()
 	val, err := s.repository.Get(ctx, CurrentHashKey)
 	if err != nil {
 		if err != badger.ErrKeyNotFound {
 			s.log.Fatal(err)
 		}
 
-		genesis := domain.Genesis()
 		s.log.Info(genesis)
 		if err = s.repository.Add(ctx, CurrentHashKey, genesis); err != nil {
 			s.log.Fatal(err)
@@ -46,10 +46,10 @@ func (s *service) InitBlockchain(ctx context.Context) *domain.Blockchain {
 		prevHash = val
 	}
 
-	blockchain := domain.Blockchain{
+	return &domain.Blockchain{
+		GenesisHash: genesis.Hash,
 		CurrentHash: prevHash,
 	}
-	return &blockchain
 }
 
 func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, data string) (*domain.Block, error) {
@@ -76,7 +76,6 @@ func (s *service) GetBlock(ctx context.Context, blockchain *domain.Blockchain) (
 	}
 
 	block := domain.Deserialize([]byte(val))
-	s.log.Info(block)
 	return block, nil
 }
 
