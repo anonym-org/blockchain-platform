@@ -1,6 +1,5 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import axios, { AxiosError } from 'axios';
 import { catchError, map } from 'rxjs';
 
 @Injectable()
@@ -14,13 +13,14 @@ export class BlocksService {
 
       const res = this.httpService
         .get('http://nginx/api/blocks')
-        .pipe(map((res) => {
-          // console.log(res.data);
-          
-          // const { data } = res.data
-          // res.data.data = JSON.parse(data ?? "{}")
-          return res.data
-        }))
+        .pipe(
+          map((res) => {
+            const { data } = res.data;
+            const parseData = JSON.parse(data.data);
+            data.data = parseData.data;
+            return res.data;
+          }),
+        )
         .pipe(
           catchError((error) => {
             this.logger.error(error);
@@ -40,11 +40,14 @@ export class BlocksService {
 
       const res = this.httpService
         .post('http://nginx/api/blocks', { data: JSON.stringify(data) })
-        .pipe(map((res) => {
-          // const { data } = res.data
-          // res.data.data = JSON.parse(data ?? "{}")
-          return res.data
-        }))
+        .pipe(
+          map((res) => {
+            const { data } = res.data;
+            const parseData = JSON.parse(data.data);
+            data.data = parseData.data;
+            return res.data;
+          }),
+        )
         .pipe(
           catchError((error) => {
             this.logger.error(error);
@@ -64,13 +67,16 @@ export class BlocksService {
 
       const res = this.httpService
         .get('http://nginx/api/blockchains')
-        .pipe(map((res) => {
-          // const { data } = res.data
-          // res.data.data = data.map((block) => 
-          //   JSON.parse(block.data ?? "{}")
-          // )
-          return res.data
-        }))
+        .pipe(
+          map((res) => {
+            const { data } = res.data;
+            data.forEach((item) => {
+              const parseData = JSON.parse(item.data);
+              item.data = parseData.data;
+            });
+            return res.data;
+          }),
+        )
         .pipe(
           catchError((error) => {
             this.logger.error(error);

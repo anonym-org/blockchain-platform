@@ -27,7 +27,7 @@ func NewProof(b *Block) *ProofOfWork {
 	return pow
 }
 
-func (pow *ProofOfWork) InitData(nounce int) (data []byte) {
+func (pow *ProofOfWork) InitData(nounce int64) (data []byte) {
 	data = bytes.Join(
 		[][]byte{
 			[]byte(pow.Block.PrevHash),
@@ -39,11 +39,11 @@ func (pow *ProofOfWork) InitData(nounce int) (data []byte) {
 	return
 }
 
-func (pow *ProofOfWork) Run() (int, string) {
+func (pow *ProofOfWork) Run() (int64, string) {
 	var intHash big.Int
 	var hash [32]byte
 
-	nounce := 0
+	nounce := int64(0)
 
 	for nounce < math.MaxInt64 {
 		data := pow.InitData(nounce)

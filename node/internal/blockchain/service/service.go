@@ -132,6 +132,7 @@ func (s *service) ListBlocks(ctx context.Context, blockchain *domain.Blockchain)
 			Hash:     block.Hash,
 			Data:     block.Data,
 			PrevHash: block.PrevHash,
+			Nounce: block.Nounce,
 		})
 	}
 

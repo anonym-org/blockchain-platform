@@ -7,3 +7,10 @@ export class CreateDto {
   @ApiProperty()
   data: any;
 }
+
+export type TBlock = {
+  hash: string;
+  data: any;
+  prev_hash: string;
+  nounce: number;
+};

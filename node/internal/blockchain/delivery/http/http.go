@@ -94,6 +94,6 @@ func (c *controller) getListBlocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpresponse.WriteSuccessResponse(w, r, http.StatusOK, "get list blocks from blockchain", blocks)
+	httpresponse.WriteSuccessResponse(w, r, http.StatusOK, "get list block from blockchain", blocks)
 	return
 }

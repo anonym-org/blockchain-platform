@@ -14,7 +14,7 @@ type Block struct {
 	Hash     string `json:"hash"`
 	Data     string `json:"data"`
 	PrevHash string `json:"prev_hash"`
-	Nounce   int    `json:"nounce"`
+	Nounce   int64  `json:"nounce"`
 }
 
 type GenesisDTO struct {
