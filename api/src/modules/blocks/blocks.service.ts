@@ -15,8 +15,10 @@ export class BlocksService {
       const res = this.httpService
         .get('http://nginx/api/blocks')
         .pipe(map((res) => {
-          const { data } = res.data
-          res.data.data = JSON.parse(data ?? "{}")?.data
+          // console.log(res.data);
+          
+          // const { data } = res.data
+          // res.data.data = JSON.parse(data ?? "{}")
           return res.data
         }))
         .pipe(
@@ -39,8 +41,8 @@ export class BlocksService {
       const res = this.httpService
         .post('http://nginx/api/blocks', { data: JSON.stringify(data) })
         .pipe(map((res) => {
-          const { data } = res.data
-          res.data.data = JSON.parse(data ?? "{}")?.data
+          // const { data } = res.data
+          // res.data.data = JSON.parse(data ?? "{}")
           return res.data
         }))
         .pipe(
@@ -63,10 +65,10 @@ export class BlocksService {
       const res = this.httpService
         .get('http://nginx/api/blockchains')
         .pipe(map((res) => {
-          const { data } = res.data
-          res.data.data = data.map((block) => 
-            JSON.parse(block.data ?? "{}").data
-          )
+          // const { data } = res.data
+          // res.data.data = data.map((block) => 
+          //   JSON.parse(block.data ?? "{}")
+          // )
           return res.data
         }))
         .pipe(

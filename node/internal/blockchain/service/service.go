@@ -65,7 +65,6 @@ func (s *service) AddBlock(ctx context.Context, blockchain *domain.Blockchain, d
 		return nil, err
 	}
 	blockchain.CurrentHash = newBlock.Hash
-
 	return newBlock, nil
 }
 
@@ -77,6 +76,7 @@ func (s *service) GetBlock(ctx context.Context, blockchain *domain.Blockchain) (
 	}
 
 	block := domain.Deserialize([]byte(val))
+	s.log.Info(block)
 	return block, nil
 }
 

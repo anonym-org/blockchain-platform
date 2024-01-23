@@ -54,7 +54,7 @@ func (c *controller) getBlocks(w http.ResponseWriter, r *http.Request) {
 		httpresponse.WriteErrorResponse(w, r, http.StatusBadRequest, "fail to get block", "invalid_param")
 		return
 	}
-	httpresponse.WriteSuccessResponse(w, r, http.StatusOK, "get latest block from blockchain", block.Data)
+	httpresponse.WriteSuccessResponse(w, r, http.StatusOK, "get latest block from blockchain", block)
 	return
 }
 
@@ -81,7 +81,7 @@ func (c *controller) addBlock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.network.Broadcast(block)
-	httpresponse.WriteSuccessResponse(w, r, http.StatusCreated, "data added to blockchain", block.Data)
+	httpresponse.WriteSuccessResponse(w, r, http.StatusCreated, "data added to blockchain", block)
 	return
 }
 
